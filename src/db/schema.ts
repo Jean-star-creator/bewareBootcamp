@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, integer, text, timestamp, uuid, boolean } from "drizzle-orm/pg-core";
+import { boolean,integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 
 
@@ -13,7 +13,7 @@ export const userTable = pgTable("user", {
   updatedAt: timestamp('updated_at').$defaultFn(() => /* @__PURE__ */ new Date()).notNull()
 });
 
-export const sessionTable = pgTable("session_table", {
+export const sessionTable = pgTable("session", {
   id: text('id').primaryKey(),
   expiresAt: timestamp('expires_at').notNull(),
   token: text('token').notNull().unique(),
@@ -24,7 +24,7 @@ export const sessionTable = pgTable("session_table", {
   userId: text('user_id').notNull().references(() => userTable.id, { onDelete: 'cascade' })
 });
 
-export const accountTable = pgTable("account_table", {
+export const accountTable = pgTable("account", {
   id: text('id').primaryKey(),
   accountId: text('account_id').notNull(),
   providerId: text('provider_id').notNull(),
@@ -39,6 +39,19 @@ export const accountTable = pgTable("account_table", {
   createdAt: timestamp('created_at').notNull(),
   updatedAt: timestamp('updated_at').notNull()
 });
+
+export const verificationTable = pgTable("verification", {
+  id: text("id").primaryKey(),
+  identifier: text("identifier").notNull(),
+  value: text("value").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").$defaultFn(
+    () => /* @__PURE__ */ new Date(),
+  ),
+  updatedAt: timestamp("updated_at").$defaultFn(
+    () => /* @__PURE__ */ new Date(),
+  ),
+}); 
 
 export const categoryTable = pgTable("category", {
   id: uuid().primaryKey(),
@@ -92,4 +105,3 @@ export const productVariantRelations = relations(
     };
   },
 );
-
