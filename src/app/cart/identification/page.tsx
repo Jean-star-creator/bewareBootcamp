@@ -43,6 +43,9 @@ const IdentificationPage = async () => {
     (acc, item) => acc + item.productVariant.priceInCents * item.quantity,
     0,
   );
+
+  console.log("identification page")
+
   return (
     <div>
       <Header />

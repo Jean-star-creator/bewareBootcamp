@@ -38,6 +38,7 @@ export const finishOrder = async () => {
   if (!cart.shippingAddress) {
     throw new Error("Shipping address not found");
   }
+  console.log(cart.items);
   const totalPriceInCents = cart.items.reduce(
     (acc, item) => acc + item.productVariant.priceInCents * item.quantity,
     0,
@@ -78,6 +79,9 @@ export const finishOrder = async () => {
         quantity: item.quantity,
         priceInCents: item.productVariant.priceInCents,
       }));
+
+        console.log("finish ordem");
+
     await tx.insert(orderItemTable).values(orderItemsPayload);
     await tx.delete(cartTable).where(eq(cartTable.id, cart.id));
     await tx.delete(cartItemTable).where(eq(cartItemTable.cartId, cart.id));
