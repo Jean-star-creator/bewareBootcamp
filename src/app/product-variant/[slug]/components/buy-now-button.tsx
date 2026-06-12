@@ -7,15 +7,15 @@ import { Loader2 } from "lucide-react";
 import { addProductToCart } from "@/actions/add-cart-product";
 import { Button } from "@/components/ui/button";
 
-interface BuyNowtButtonProps {
+interface BuyNowButtonProps {
   productVariantId: string;
   quantity: number;
 }
 
-const BuyNowtButton = ({
+const BuyNowButton = ({
   productVariantId,
   quantity,
-}: BuyNowtButtonProps) => {
+}: BuyNowButtonProps) => {
   const queryClient = useQueryClient();
 
   // Use mutation is an operation where you will change data, you can create, update, delete and so on.
@@ -54,4 +54,4 @@ const BuyNowtButton = ({
   );
 };
 
-export default BuyNowtButton; 
+export default BuyNowButton; 
