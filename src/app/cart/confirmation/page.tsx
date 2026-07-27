@@ -45,8 +45,6 @@ const ConfirmationPage = async () => {
     redirect("/cart/identification");
   }
 
-  console.log("confirmation page");
-
   return (
     <div>
       <Header />

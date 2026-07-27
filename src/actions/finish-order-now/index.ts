@@ -8,7 +8,8 @@ import {
   cartTable,
   orderItemTable,
   orderTable,
-  productVariantTable} from "@/db/schema";
+  productVariantTable,
+} from "@/db/schema";
 import { auth } from "@/lib/auth";
 
 interface finishOrderNowProps {
@@ -21,47 +22,35 @@ export const finishOrderNow = async ({ productVariantId, quantity }: finishOrder
     headers: await headers(),
   });
 
-  if (!session) {
-    throw new Error("Unauthorized");
-  }
+  if (!session) throw new Error("Unauthorized");
 
-  // 1. Busca o carrinho e o endereço
   const cart = await db.query.cartTable.findFirst({
     where: eq(cartTable.userId, 
 session.user.id
 ),
-    with: {
-      shippingAddress: true,
-    },
+    with: { shippingAddress: true },
   });
 
-  if (!cart) {
-    throw new Error("Cart not found");
-  }
+  if (!cart) throw new Error("Cart not found");
 
-  // 2. SE NÃO HOUVER ENDEREÇO: Retornamos um objeto avisando o frontend
+  // SE NÃO TIVER ENDEREÇO, RETORNA STATUS PARA O FRONTEND
   if (!cart.shippingAddress) {
-    return { error: "MISSING_ADDRESS", message: "Endereço de entrega necessário" };
+    return { error: "MISSING_ADDRESS" };
   }
 
-  // 3. Busca a variante do produto
   const productVariant = await db.query.productVariantTable.findFirst({
     where: eq(
 productVariantTable.id
-, productVariantId)
+, productVariantId),
   });
 
-  if (!productVariant) {
-    throw new Error("Product variant not found");
-  }
+  if (!productVariant) throw new Error("Product variant not found");
 
   const totalPriceInCents = productVariant.priceInCents * quantity;
   let orderId: string | undefined;
 
-  // 4. Inicia a transação para criar o pedido
   await db.transaction(async (tx) => {
-    // Como já validamos acima, o TS precisa saber que aqui o shippingAddress existe
-    const address = cart.shippingAddress!;
+    const address = cart.shippingAddress!; // Aqui temos certeza que existe
 
     const [order] = await tx
       .insert(orderTable)
@@ -96,9 +85,7 @@ address.id
       })
       .returning();
 
-    if (!order) {
-      throw new Error("Failed to create order");
-    }
+    if (!order) throw new Error("Failed to create order");
 
     orderId = 
 order.id
@@ -116,9 +103,5 @@ productVariant.id
     }]);
   });
 
-  if (!orderId) {
-    throw new Error("Failed to create order");
-  }
-
-  return { orderId, success: true };
+  return { orderId };
 }; 

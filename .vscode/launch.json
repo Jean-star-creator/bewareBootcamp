@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Next.js",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000", // Ou a porta que seu Next.js usa
+      "webRoot": "${workspaceFolder}",
+      "runtimeExecutable": "pnpm", // Ou "npm" ou "yarn" dependendo do seu gerenciador de pacotes
+      "runtimeArgs": ["dev"], // O comando que inicia o seu servidor Next.js
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
+    },
+    {
+      "name": "Next.js: Attach to Node",
+      "type": "node",
+      "request": "attach",
+      "port": 9229, // A porta de depuração padrão para Node.js
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}",
+      "remoteRoot": "${workspaceFolder}",
+      "restart": true
+    }
+  ]
+}

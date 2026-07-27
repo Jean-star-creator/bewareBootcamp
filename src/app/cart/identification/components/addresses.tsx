@@ -46,14 +46,17 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+// Adicione a prop 'onSuccessPath'
 interface AddressesProps {
   shippingAddresses: (typeof shippingAddressTable.$inferSelect)[];
   defaultShippingAddressId: string | null;
+  onSuccessPath?: string; // <-- Nova prop opcional
 }
 
 const Addresses = ({
   shippingAddresses,
   defaultShippingAddressId,
+  onSuccessPath, // <-- Receba aqui
 }: AddressesProps) => {
   const router = useRouter();
   const [selectedAddress, setSelectedAddress] = useState<string | null>(
@@ -84,36 +87,36 @@ const Addresses = ({
 
   const onSubmit = async (values: FormValues) => {
     try {
-      const newAddress =
-        await createShippingAddressMutation.mutateAsync(values);
-      toast.success("Endereço criado com sucesso!");
-      form.reset();
-      setSelectedAddress(newAddress.id);
-
+      const newAddress = await createShippingAddressMutation.mutateAsync(values);
       await updateCartShippingAddressMutation.mutateAsync({
         shippingAddressId: newAddress.id,
       });
-      toast.success("Endereço vinculado ao carrinho!");
+      toast.success("Endereço salvo!");
+      
+      const nextStep = onSuccessPath || "/cart/confirmation";
+      router.push(nextStep);
     } catch (error) {
-      toast.error("Erro ao criar endereço. Tente novamente.");
-      console.error(error);
+      toast.error(`Erro ao selecionar endereço.erro:${error}`);
     }
   };
 
   const handleGoToPayment = async () => {
     if (!selectedAddress || selectedAddress === "add_new") return;
-
     try {
       await updateCartShippingAddressMutation.mutateAsync({
         shippingAddressId: selectedAddress,
       });
-      toast.success("Endereço selecionado para entrega AGORA!");
-      router.push("/cart/confirmation");
-    } catch (error) {
-      toast.error("Erro ao selecionar endereço. Tente novamente.");
-      console.error(error);
+      toast.success("Endereço selecionado!");
+      
+      // Se tiver um caminho específico (Buy Now), vai para ele. 
+      // Se não, vai para o padrão do carrinho.
+      const nextStep = onSuccessPath || "/cart/confirmation";
+      router.push(nextStep);
+    } catch  (error) {
+      toast.error(`Erro ao selecionar endereço.erro:${error}`);
     }
   };
+;
 
   return (
     <Card>
